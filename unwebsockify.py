@@ -48,7 +48,7 @@ class Proxy:
     async def handle_client(self, r, w):
         peer = w.get_extra_info("peername")
         print(f'{peer} connected')
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         try:
             async with websockets.connect(
                     self.url, subprotocols=self.subproto) as ws:
@@ -96,7 +96,8 @@ def main(argv):
 
     args = parser.parse_args()
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     proxy = Proxy(args.port, args.listen, args.url, args.subproto)
     loop.run_until_complete(proxy.start())
     loop.run_forever()
